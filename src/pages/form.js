@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import Form from "next/form";
 
-// questions:
-// why warning for 'for' when mdn says its ok
-
 export default function FormPg() {
   const [essayPrompt, setEssayPrompt] = useState("");
 
