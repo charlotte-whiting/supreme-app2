@@ -25,12 +25,15 @@ export default function Home() {
   return (
     <div>
       {hello} <Link href="/about">About</Link>
+      <br />
       <Image
         src={"/charlatte.jpeg"}
         alt="charlatte car"
         width="164"
         height="164"
       />
+      <br />
+      new form --{">"} <Link href="/form">Click me</Link>
     </div>
   );
 }
