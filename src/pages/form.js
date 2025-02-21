@@ -2,45 +2,26 @@ import { useEffect, useState } from "react";
 import Form from "next/form";
 
 // questions:
-// next Form vs form
-// dependencies q below
-// storing data - prob falls under Form v form?
 // why warning for 'for' when mdn says its ok
-
-// async function FetchAiResult() {
-//   try {
-//     // ai code: i think the current problem is that useEffect rerenders everytime bc the prompt keeps changing?
-//     // no idea how to get around this...
-//     const { GoogleGenerativeAI } = require("@google/generative-ai");
-//     const genAI = new GoogleGenerativeAI("uhhh put the api key in");
-//     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-//     const prompt =
-//       "Give me a short paragraph prompt that would be given in a college history course";
-
-//     const res = await model.generateContent(prompt);
-//     // console.log(res.response.text());
-//     return res.response.text();
-//   } catch (error) {
-//     console.log("you messed up again", error.message);
-//   }
-// }
 
 export default function FormPg() {
   const [essayPrompt, setEssayPrompt] = useState("");
-  // useEffect(() => {
-  //   const result = async () => {
-  //     try {
-  //       const res = await FetchAiResult();
-  //       setEssayPrompt(res);
-  //     } catch (error) {
-  //       console.error(error.message);
-  //     }
-  //   };
-  //   result();
-  // }, []);
-  // // ^ why does adding 'no dependencies' work?
 
-  // console.log(essayPrompt);
+  useEffect(() => {
+    const result = async () => {
+      try {
+        const res = await fetch("/api/ai-response");
+        // console.log(res);
+        const json = await res.json();
+        setEssayPrompt(JSON.stringify(json.message));
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+    result();
+  }, []);
+
+  console.log(essayPrompt);
 
   return (
     <div>
@@ -48,15 +29,15 @@ export default function FormPg() {
       <br />
       <Form>
         {/* name */}
-        <label for="name">Name please</label>
+        <label htmlFor="name">Name please</label>
         <input type="text" id="name" />
         <br />
         {/* fingers? */}
-        <label for="finger">Approximate number of fingers</label>
+        <label htmlFor="finger">Approximate number of fingers</label>
         <input type="number" id="finger" />
         <br />
         {/* how many hours of sleep */}
-        <label for="sleep">
+        <label htmlFor="sleep">
           How many hours did you sleep last night? {"("}round up{")"}
         </label>
         <select name="sleephours" id="sleep">
@@ -70,7 +51,7 @@ export default function FormPg() {
         </select>
         <br />
         {/* select all animals */}
-        <label for="animals">Pick animals that you resonate with:</label>
+        <label htmlFor="animals">Pick animals that you resonate with:</label>
         <select name="resonators" id="animals" multiple={true}>
           <option value="capybara">capybara</option>
           <option value="skink">skink</option>
@@ -86,7 +67,7 @@ export default function FormPg() {
         </select>
         <br />
         {/* chatgpt prompt */}
-        <label for="prompt">
+        <label htmlFor="prompt">
           Please answer this definitely not AI generated prompt:{" "}
           {essayPrompt
             ? essayPrompt
