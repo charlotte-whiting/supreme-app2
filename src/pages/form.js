@@ -12,9 +12,7 @@ import Form from "next/form";
 //     // ai code: i think the current problem is that useEffect rerenders everytime bc the prompt keeps changing?
 //     // no idea how to get around this...
 //     const { GoogleGenerativeAI } = require("@google/generative-ai");
-//     const genAI = new GoogleGenerativeAI(
-//       "uhhh put the api key in"
-//     );
+//     const genAI = new GoogleGenerativeAI("uhhh put the api key in");
 //     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 //     const prompt =
 //       "Give me a short paragraph prompt that would be given in a college history course";
@@ -28,12 +26,6 @@ import Form from "next/form";
 // }
 
 export default function FormPg() {
-  // name - string
-  // height - number
-  // how many hours of sleep did you get - range picker
-  // all animals that you feel like apply to you - checkbox
-  // answer this essay question from google ai
-
   const [essayPrompt, setEssayPrompt] = useState("");
   // useEffect(() => {
   //   const result = async () => {
