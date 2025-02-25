@@ -18,13 +18,30 @@ export default function FormPg() {
     result();
   }, []);
 
-  console.log(essayPrompt);
+  const submit = async (event) => {
+    event.preventDefault()
+    const formData = new FormData()
+    formData.append('name', event.target[0].value)
+    formData.append('fingers', event.target[1].value)
+    formData.append('sleep', event.target[2])
+    formData.append('animal', event.target[3])
+    formData.append('essay', event.target[0].value)
+    console.log(formData.has('name'))
+    const response = await fetch('/api/submit', {
+      method: 'POST',
+      body: formData
+    })
+    const data = await response.json()
+    console.log("here", data)
+  }
+
+  // console.log(essayPrompt);
 
   return (
     <div>
       give us some information about you
       <br />
-      <Form>
+      <Form onSubmit={submit}>
         {/* name */}
         <label htmlFor="name">Name please</label>
         <input type="text" id="name" />
@@ -72,6 +89,8 @@ export default function FormPg() {
         </label>
         <br />
         <textarea id="prompt" name="prompt" rows="4" cols="50" />
+        <br/>
+        <input type="submit" id="submit" value="Submit Answers"/>
       </Form>
     </div>
   );

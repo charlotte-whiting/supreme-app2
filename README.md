@@ -2,7 +2,7 @@
 
 This is a simple website portfolio for now
 
-## Deploy as Node Web Service
+## View Page
 
 Click the button below to view the app.
 
