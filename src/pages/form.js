@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-// import Form from "next/form";
-import { Button, InputLabel, MenuItem, Select, Stack, TextField, Container, Typography } from "@mui/material";
+import { Button, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 
 
 export default function FormPg() {
@@ -11,7 +10,6 @@ export default function FormPg() {
     const result = async () => {
       try {
         const res = await fetch("/api/ai-response");
-        // console.log(res);
         const json = await res.json();
         setEssayPrompt(JSON.stringify(json.message));
       } catch (error) {
@@ -28,13 +26,6 @@ export default function FormPg() {
 
   const onSubmit = async (event) => {
     event.preventDefault()
-    // const formData = new FormData(event.target)
-    // formData.append('name', event.target[0].value)
-    // formData.append('fingers', event.target[1].value)
-    // formData.append('sleep', event.target[2])
-    console.log(event.target[4].value)
-    // formData.append('animal', event.target[3])
-    // formData.append('essay', event.target[0].value)
     const response = await fetch('/api/submit', {
       headers: {
         'Accept': 'application/json',
@@ -47,32 +38,15 @@ export default function FormPg() {
     console.log(data)
   }
 
-  // console.log(essayPrompt);
-
   return (
-    <Container>
-      <Stack container direction="column" sx={{justifyContent: "flex-start", alignItems: "flex-start"}} spacing={2}>
-        {/* why item no work */}
-        {/* this isnt working and i'm tired of spending hours googling */}
-        {/* <Item>give us some information about you</Item> */}
-      {/* am i supposed to wrap this in <Box type=form> or somethign? */}
-        <form onSubmit={onSubmit} sx={{maxWidth:1/4}}>
+      <Stack container direction="column" sx={{maxWidth:1/2}} spacing={2}>
+        <form onSubmit={onSubmit}>
           {/* name */}
-          {/* <label htmlFor="name">Name please</label> */}
          <TextField label="name" variant="outlined" id="name" />
          {/* fingers? */}
          <InputLabel id="finger">Approximate number of fingers</InputLabel>
          <TextField  label="" variant="outlined" id="finger" />
           {/* how many hours of sleep */}
-         {/* <InputLabel id="sleep" >
-           How many hours did you sleep last night? {"("}round up{")"}
-         </InputLabel>
-         <Select value="" name="sleephours" labelId="sleep" id="sleep_select">
-           <MenuItem value="0-3">0 - 3</MenuItem>
-           <MenuItem value="4-7">4 - 7</MenuItem>
-           <MenuItem value="8-11">8 - 11</MenuItem>
-           <MenuItem value="12+">12+</MenuItem>
-         </Select> */}
         {/* select all animals */}
          <InputLabel id="animals">Pick animals that you resonate with:</InputLabel>
          <Select value={animal} name="resonators" labelId="animals" multiple={true} onChange={onSelectChange}>
@@ -100,6 +74,5 @@ export default function FormPg() {
          <Button variant="outlined" type="submit">Submit Answers</Button>
        </form>
        </Stack>
-     </Container>
   );
 }
