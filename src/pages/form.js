@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import Form from "next/form";
+import { Button, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+
 
 export default function FormPg() {
   const [essayPrompt, setEssayPrompt] = useState("");
+  const [animal, setAnimal] = useState([])
 
   useEffect(() => {
     const result = async () => {
       try {
         const res = await fetch("/api/ai-response");
-        // console.log(res);
         const json = await res.json();
         setEssayPrompt(JSON.stringify(json.message));
       } catch (error) {
@@ -18,61 +19,60 @@ export default function FormPg() {
     result();
   }, []);
 
-  console.log(essayPrompt);
+  const onSelectChange = (event) => {
+    const value = event.target.value
+    setAnimal(typeof value === 'string' ? value.split(',') : value,)
+  }
+
+  const onSubmit = async (event) => {
+    event.preventDefault()
+    const response = await fetch('/api/submit', {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify({name: event.target[0].value, fingers: event.target[2].value, animals: animal, prompt: event.target[6].value})
+    })
+    const data = await response.json()
+    console.log(data)
+  }
 
   return (
-    <div>
-      give us some information about you
-      <br />
-      <Form>
-        {/* name */}
-        <label htmlFor="name">Name please</label>
-        <input type="text" id="name" />
-        <br />
-        {/* fingers? */}
-        <label htmlFor="finger">Approximate number of fingers</label>
-        <input type="number" id="finger" />
-        <br />
-        {/* how many hours of sleep */}
-        <label htmlFor="sleep">
-          How many hours did you sleep last night? {"("}round up{")"}
-        </label>
-        <select name="sleephours" id="sleep">
-          <option value="">
-            Pick one! {"("}not this one{")"}
-          </option>
-          <option value="0-3">0 - 3</option>
-          <option value="4-7">4 - 7</option>
-          <option value="8-11">8 - 11</option>
-          <option value="12+">12+</option>
-        </select>
-        <br />
+      <Stack container direction="column" sx={{maxWidth:1/2}} spacing={2}>
+        <form onSubmit={onSubmit}>
+          {/* name */}
+         <TextField label="name" variant="outlined"/>
+         {/* fingers? */}
+         <InputLabel>Approximate number of fingers</InputLabel>
+         <TextField  label="" variant="outlined"/>
+          {/* how many hours of sleep */}
         {/* select all animals */}
-        <label htmlFor="animals">Pick animals that you resonate with:</label>
-        <select name="resonators" id="animals" multiple={true}>
-          <option value="capybara">capybara</option>
-          <option value="skink">skink</option>
-          <option value="skunk">skunk</option>
-          <option value="cuttlefish">cuttlefish</option>
-          <option value="armadillo">armadillo</option>
-          <option value="zebra">zebra</option>
-          <option value="quokka">quokka</option>
-          <option value="blobfish">blobfish</option>
-          <option value="prarie dog">prarie dog</option>
-          <option value="scottish cow">scottish cow</option>
-          <option value="barracuda">barracuda</option>
-        </select>
-        <br />
-        {/* chatgpt prompt */}
-        <label htmlFor="prompt">
+         <InputLabel>Pick animals that you resonate with:</InputLabel>
+         <Select value={animal} name="resonators" labelId="animals" multiple={true} onChange={onSelectChange}>
+           <MenuItem value="capybara">capybara</MenuItem>
+           <MenuItem value="skink">skink</MenuItem>
+           <MenuItem value="skunk">skunk</MenuItem>
+           <MenuItem value="cuttlefish">cuttlefish</MenuItem>
+           <MenuItem value="armadillo">armadillo</MenuItem>
+           <MenuItem value="zebra">zebra</MenuItem>
+           <MenuItem value="quokka">quokka</MenuItem>
+           <MenuItem value="blobfish">blobfish</MenuItem>
+           <MenuItem value="prarie dog">prarie dog</MenuItem>
+           <MenuItem value="scottish cow">scottish cow</MenuItem>
+           <MenuItem value="barracuda">barracuda</MenuItem>
+         </Select>
+         {/* chatgpt prompt */}
+         <Typography>
           Please answer this definitely not AI generated prompt:{" "}
           {essayPrompt
             ? essayPrompt
             : "Oops no api key :/ ... just write something fun"}
-        </label>
-        <br />
-        <textarea id="prompt" name="prompt" rows="4" cols="50" />
-      </Form>
-    </div>
+         </Typography>
+         <TextField name="prompt" label="" rows="50" cols="50" />
+         <br/>
+         <Button variant="outlined" type="submit">Submit Answers</Button>
+       </form>
+       </Stack>
   );
 }
