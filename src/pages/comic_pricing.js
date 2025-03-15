@@ -33,7 +33,9 @@ function PriceChart({ entries }) {
               <TableRow key={i}>
                 <TableCell>{value[0]}</TableCell>
                 <TableCell>{value[1]}</TableCell>
-                <TableCell>{value[2]}</TableCell>
+                <TableCell>
+                  <strong>{value[2]}</strong>
+                </TableCell>
               </TableRow>
             );
           })}
