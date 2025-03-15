@@ -1,0 +1,40 @@
+{
+  "editor.formatOnSave": true,
+  "security.workspace.trust.untrustedFiles": "open",
+  "[go]": {
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    }
+  },
+  "workbench.startupEditor": "none",
+  "remote.SSH.defaultExtensions": ["gitpod.gitpod-remote-ssh"],
+  "remote.SSH.remotePlatform": {
+    "*.gitpod.io": "linux"
+  },
+  "workbench.colorTheme": "Panda Syntax",
+  "eslint.codeActionsOnSave.rules": null,
+  "eslint.validate": ["javascript", "typescript"],
+  "eslint.probe": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "html",
+    "vue",
+    "markdown",
+    "json"
+  ],
+  "workbench.settings.applyToAllProfiles": ["eslint.probe"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.timeBudget.onValidation": {
+    "warn": 4000,
+    "error": 8000
+  },
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+}
