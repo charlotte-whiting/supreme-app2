@@ -53,13 +53,9 @@ export default function FormPg() {
   return (
     <Stack container direction="column" sx={{ maxWidth: 1 / 2 }} spacing={2}>
       <form onSubmit={onSubmit}>
-        {/* name */}
         <TextField label="name" variant="outlined" />
-        {/* fingers? */}
         <InputLabel>Approximate number of fingers</InputLabel>
         <TextField label="" variant="outlined" />
-        {/* how many hours of sleep */}
-        {/* select all animals */}
         <InputLabel>Pick animals that you resonate with:</InputLabel>
         <Select
           value={animal}
@@ -80,7 +76,6 @@ export default function FormPg() {
           <MenuItem value="scottish cow">scottish cow</MenuItem>
           <MenuItem value="barracuda">barracuda</MenuItem>
         </Select>
-        {/* chatgpt prompt */}
         <Typography>
           Please answer this definitely not AI generated prompt:{" "}
           {essayPrompt

@@ -50,7 +50,6 @@ export default function ComicPricing() {
   const [entries, setEntries] = useState([]);
 
   const onSubmit = async () => {
-    console.log(pastedCSV);
     const comics = pastedCSV.split(",");
     const response = await fetch("/api/price_response", {
       headers: {
@@ -61,7 +60,6 @@ export default function ComicPricing() {
       body: JSON.stringify(comics),
     });
     const data = await response.json();
-    console.log(data);
     setEntries(data.message);
   };
 

@@ -13,7 +13,6 @@ export default function Home() {
           throw new Error(`Response status: ${res.status}`);
         }
         const json = await res.json();
-        console.log(json);
         setHello(JSON.stringify(json.message));
       } catch (error) {
         console.error(error.message);
