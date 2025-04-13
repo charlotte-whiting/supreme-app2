@@ -6,17 +6,17 @@ export default async function handler(req: NextApiRequest, res) {
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-  const toReturn = [];
+  const allComics = [];
 
   await Promise.all(
-    req.body.map(async (x) => {
-      const prompt = `Please tell me only the estimated value for an ungraded ${x} in very fine condition in the following format: *Title* *Issue Number* *Price Range*`;
+    req.body.map(async (comicNameAndIssue) => {
+      const prompt = `Please tell me only the estimated value for an ungraded ${comicNameAndIssue} in very fine condition in the following format: *Title* *Issue Number* *Price Range*`;
       const result = await model.generateContent(prompt);
-      const response = result.response.text();
-      const splitResponse = response.split("*");
-      const concat = [splitResponse[1], splitResponse[3], splitResponse[5]];
-      toReturn.push(concat);
+      const comic = result.response.text();
+      const splitResponse = comic.split("*");
+      // 1/3/5 bc of split
+      allComics.push([splitResponse[1], splitResponse[3], splitResponse[5]]);
     })
   );
-  res.status(200).json({ message: toReturn });
+  res.status(200).json({ message: allComics });
 }
