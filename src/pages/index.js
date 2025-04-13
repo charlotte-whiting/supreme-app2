@@ -13,7 +13,6 @@ export default function Home() {
           throw new Error(`Response status: ${res.status}`);
         }
         const json = await res.json();
-        console.log(json);
         setHello(JSON.stringify(json.message));
       } catch (error) {
         console.error(error.message);
@@ -34,6 +33,7 @@ export default function Home() {
       />
       <br />
       new form --{">"} <Link href="/form">Click me</Link>
+      <Link href="/comic_pricing"> new new feature</Link>
     </div>
   );
 }
