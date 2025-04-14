@@ -6,7 +6,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TableSortLabel,
   TextField,
   Typography,
 } from "@mui/material";
@@ -21,7 +20,7 @@ function PriceChart({ entries }) {
           <TableCell>Title</TableCell>
           <TableCell>Issue Number</TableCell>
           <TableCell>
-            <TableSortLabel active={true}></TableSortLabel>
+            {/* <TableSortLabel active={true}></TableSortLabel> */}
             Est. Price Range
           </TableCell>
         </TableRow>
