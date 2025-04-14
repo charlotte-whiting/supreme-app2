@@ -14,31 +14,33 @@ import { useState } from "react";
 function PriceChart({ entries }) {
   // entries[0] - title, entries[1] - number, entries[2] - price range
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Title</TableCell>
-          <TableCell>Issue Number</TableCell>
-          <TableCell>
-            {/* <TableSortLabel active={true}></TableSortLabel> */}
-            Est. Price Range
-          </TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {entries.map((value, i) => {
-          return (
-            <TableRow key={i}>
-              <TableCell>{value[0]}</TableCell>
-              <TableCell>{value[1]}</TableCell>
-              <TableCell>
-                <strong>{value[2]}</strong>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+    <div>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Title</TableCell>
+            <TableCell>Issue Number</TableCell>
+            <TableCell>
+              {/* <TableSortLabel active={true}></TableSortLabel> */}
+              Est. Price Range
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {entries.map((value, i) => {
+            return (
+              <TableRow key={i}>
+                <TableCell>{value[0]}</TableCell>
+                <TableCell>{value[1]}</TableCell>
+                <TableCell>
+                  <strong>{value[2]}</strong>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </div>
   );
 }
 
