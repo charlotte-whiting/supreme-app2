@@ -63,6 +63,17 @@ export default function ComicPricing() {
     setComicsData(data.message);
   };
 
+  const onClickDb = async () => {
+    const response = await fetch("api/db-test", {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    console.log(data);
+  };
+
   return (
     <Stack direction="row" spacing={2} sx={{ justifyContent: "space-evenly" }}>
       <Stack
@@ -89,6 +100,9 @@ export default function ComicPricing() {
         />
         <Button variant="outlined" type="submit" onClick={onSubmit}>
           Submit Answers
+        </Button>
+        <Button variant="outlined" type="submit" onClick={onClickDb}>
+          db
         </Button>
       </Stack>
       <PriceChart entries={comicsData} />
