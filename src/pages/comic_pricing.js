@@ -49,7 +49,6 @@ export default function ComicPricing() {
   const [comicsData, setComicsData] = useState([]);
 
   const onSubmit = async () => {
-    console.log(pastedCSV);
     const comics = pastedCSV.split("\n");
     const response = await fetch("/api/price_response", {
       headers: {
@@ -61,17 +60,6 @@ export default function ComicPricing() {
     });
     const data = await response.json();
     setComicsData(data.message);
-  };
-
-  const onClickDb = async () => {
-    const response = await fetch("api/db-test", {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await response.json();
-    console.log(data);
   };
 
   return (
@@ -100,9 +88,6 @@ export default function ComicPricing() {
         />
         <Button variant="outlined" type="submit" onClick={onSubmit}>
           Submit Answers
-        </Button>
-        <Button variant="outlined" type="submit" onClick={onClickDb}>
-          db
         </Button>
       </Stack>
       <PriceChart entries={comicsData} />

@@ -24,9 +24,7 @@ export default async function handler(req: NextApiRequest, res) {
         values: [splitResponse[1], splitResponse[3], splitResponse[5]],
       };
 
-      const res = await pool.query(query);
-      console.log(res.rows[0]);
-      console.log(allComics);
+      pool.query(query);
     })
   );
   res.status(200).json({ message: allComics });
