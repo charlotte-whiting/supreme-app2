@@ -32,7 +32,6 @@ export default function Home() {
         height="164"
       />
       <br />
-      new form --{">"} <Link href="/form">Click me</Link>
       <Link href="/comic_pricing"> new new feature</Link>
     </div>
   );
