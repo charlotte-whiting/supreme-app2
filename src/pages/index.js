@@ -33,6 +33,8 @@ export default function Home() {
       />
       <br />
       <Link href="/comic_pricing"> new new feature</Link>
+      <br />
+      <Link href="/extended_info"> ai search feature</Link>
     </div>
   );
 }
