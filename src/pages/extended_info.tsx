@@ -82,11 +82,26 @@ function SearchResults({ results }) {
   );
 }
 
+function SearchProgress({ progress }) {
+  console.log(progress[0]);
+  let searchList = "";
+  for (let i = 0; i < progress.length; i++) {
+    const next = i == progress.length - 1 ? "" : " > ";
+    searchList = searchList + progress[i] + next;
+  }
+  return (
+    <Stack>
+      <Typography>Current Search History:</Typography>
+      <Typography sx={{ pl: 2 }}>{searchList}</Typography>
+    </Stack>
+  );
+}
+
 export default function ExtendedInfo() {
   const [searchText, setSearchText] = useState("");
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  // const [searchTerms, setSearchTerms] = useState([]);
+  const [searchProgress, setSearchProgress] = useState([]);
 
   const onSubmit = async () => {
     setIsLoading(true);
@@ -101,6 +116,8 @@ export default function ExtendedInfo() {
     const aiResults = await response.json();
     setResults(JSON.parse(aiResults.message));
     setIsLoading(false);
+    setSearchProgress([...searchProgress, searchText]);
+    setSearchText("");
   };
   return (
     <Stack>
@@ -114,6 +131,7 @@ export default function ExtendedInfo() {
       <Button type="submit" onClick={onSubmit}>
         Submit
       </Button>
+      {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
       {isLoading ? <CircularProgress /> : null}
       {results ? <SearchResults results={results} /> : null}
     </Stack>
