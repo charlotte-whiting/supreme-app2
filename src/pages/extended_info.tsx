@@ -33,7 +33,7 @@ function SearchResults({ results }) {
   };
   return (
     <Stack>
-      <Stack direction="row">
+      <Stack direction="row" gap={5} sx={{ mt: 5 }}>
         <Typography>
           Here are the search results - select what interest you!
         </Typography>
