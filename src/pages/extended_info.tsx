@@ -18,10 +18,6 @@ function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
   const [checkedMap, setCheckedMap] = useState(new Map());
   const [displayDesc, setDisplayDesc] = useState(false);
   const categories = Object.keys(results);
-  // categories.forEach((category) => {
-  //   checkedMap[category] = {};
-  // });
-  console.log(checkedMap);
   const handleCheck = (category: string, name: string) => () => {
     const isChecked = checkedMap.get(category + " " + name) || false;
     const newCheckedMap = new Map(checkedMap);
@@ -33,8 +29,6 @@ function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
       const newClickedSearchText = clickedSearchText.filter(
         (item) => item != name
       );
-      console.log("should uncheck");
-      console.log(newClickedSearchText);
       setClickedSearchText(newClickedSearchText);
     }
   };
@@ -142,7 +136,6 @@ export default function ExtendedInfo() {
     setSearchProgress([...searchProgress, typedSearchText]);
     setTypedSearchText("");
   };
-  console.log(clickedSearchText);
   return (
     <Stack>
       <TextField
@@ -155,9 +148,7 @@ export default function ExtendedInfo() {
         typedSearchText={typedSearchText}
         clickedSearchText={clickedSearchText}
       />
-      <Button type="submit" onClick={onSubmit}>
-        Submit
-      </Button>
+      <Button onClick={onSubmit}>Submit</Button>
       {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
       {isLoading ? <CircularProgress /> : null}
       {results ? (
