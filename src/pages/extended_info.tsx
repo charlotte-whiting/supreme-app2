@@ -14,22 +14,29 @@ import { useState } from "react";
 
 // checkbox is to explore, heart is interest - to db
 
-function SearchResults({ results }) {
-  const [checkedMap, setCheckedMap] = useState({});
+function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
+  const [checkedMap, setCheckedMap] = useState(new Map());
   const [displayDesc, setDisplayDesc] = useState(false);
   const categories = Object.keys(results);
-  categories.forEach((category) => {
-    checkedMap[category] = [];
-  });
+  // categories.forEach((category) => {
+  //   checkedMap[category] = {};
+  // });
+  console.log(checkedMap);
   const handleCheck = (category: string, name: string) => () => {
-    const shouldBeChecked = !checkedMap[category]?.name;
-    setCheckedMap({
-      ...checkedMap,
-      [category]: {
-        ...checkedMap[category],
-        [name]: shouldBeChecked,
-      },
-    });
+    const isChecked = checkedMap.get(category + " " + name) || false;
+    const newCheckedMap = new Map(checkedMap);
+    newCheckedMap.set(category + " " + name, !isChecked);
+    setCheckedMap(newCheckedMap);
+    if (!isChecked) {
+      setClickedSearchText([...clickedSearchText, name]);
+    } else {
+      const newClickedSearchText = clickedSearchText.filter(
+        (item) => item != name
+      );
+      console.log("should uncheck");
+      console.log(newClickedSearchText);
+      setClickedSearchText(newClickedSearchText);
+    }
   };
   return (
     <Stack>
@@ -48,19 +55,20 @@ function SearchResults({ results }) {
       </Stack>
       <Stack direction="row">
         {categories.map((category) => {
-          console.log(results[category]);
           return (
             <FormControl key={category}>
               <FormLabel>{category}</FormLabel>
               <FormGroup>
                 {results[category].map((item, i) => {
-                  console.log(checkedMap[category][item.name]);
                   return (
                     <Stack key={i}>
                       <FormControlLabel
                         control={
                           <Checkbox
-                            checked={checkedMap[category][item.name]}
+                            checked={
+                              checkedMap.get(category + " " + item.name) ||
+                              false
+                            }
                             onChange={handleCheck(category, item.name)}
                             name={item.name}
                           />
@@ -83,7 +91,6 @@ function SearchResults({ results }) {
 }
 
 function SearchProgress({ progress }) {
-  console.log(progress[0]);
   let searchList = "";
   for (let i = 0; i < progress.length; i++) {
     const next = i == progress.length - 1 ? "" : " > ";
@@ -97,8 +104,24 @@ function SearchProgress({ progress }) {
   );
 }
 
+function SearchDisplay({ typedSearchText, clickedSearchText }) {
+  let clickedList = "";
+  for (let i = 0; i < clickedSearchText.length; i++) {
+    const next = i == clickedSearchText.length - 1 ? "" : ", ";
+    clickedList = clickedList + clickedSearchText[i] + next;
+  }
+  return (
+    <Stack direction="row">
+      <Typography>
+        {typedSearchText}, {clickedList}
+      </Typography>
+    </Stack>
+  );
+}
+
 export default function ExtendedInfo() {
-  const [searchText, setSearchText] = useState("");
+  const [typedSearchText, setTypedSearchText] = useState("");
+  const [clickedSearchText, setClickedSearchText] = useState([]);
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [searchProgress, setSearchProgress] = useState([]);
@@ -111,29 +134,39 @@ export default function ExtendedInfo() {
         "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify(searchText),
+      body: JSON.stringify(typedSearchText),
     });
     const aiResults = await response.json();
     setResults(JSON.parse(aiResults.message));
     setIsLoading(false);
-    setSearchProgress([...searchProgress, searchText]);
-    setSearchText("");
+    setSearchProgress([...searchProgress, typedSearchText]);
+    setTypedSearchText("");
   };
+  console.log(clickedSearchText);
   return (
     <Stack>
       <TextField
         label="Search"
         onChange={(event) => {
-          setSearchText(event.target.value);
+          setTypedSearchText(event.target.value);
         }}
       />
-      <Typography>{searchText}</Typography>
+      <SearchDisplay
+        typedSearchText={typedSearchText}
+        clickedSearchText={clickedSearchText}
+      />
       <Button type="submit" onClick={onSubmit}>
         Submit
       </Button>
       {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
       {isLoading ? <CircularProgress /> : null}
-      {results ? <SearchResults results={results} /> : null}
+      {results ? (
+        <SearchResults
+          results={results}
+          setClickedSearchText={setClickedSearchText}
+          clickedSearchText={clickedSearchText}
+        />
+      ) : null}
     </Stack>
   );
 }
