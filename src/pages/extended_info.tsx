@@ -1,19 +1,25 @@
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import MenuIcon from "@mui/icons-material/Menu";
+
 import {
   AppBar,
+  Box,
   Button,
   Checkbox,
   Chip,
   CircularProgress,
+  CssBaseline,
   Drawer,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormLabel,
+  IconButton,
   List,
   ListItem,
   Stack,
   TextField,
+  Toolbar,
   Typography,
 } from "@mui/material";
 import {
@@ -86,7 +92,7 @@ function SearchResults({ results }) {
 
   return (
     <Stack>
-      <Stack direction="row" gap={5} sx={{ mt: 5 }}>
+      <Stack direction="row" sx={{ mt: 5 }}>
         <Typography>
           Here are the search results - select what interest you!
         </Typography>
@@ -133,7 +139,7 @@ function SearchResults({ results }) {
                                     <Favorite />
                                   )
                                 }
-                                onClick={handleFavorite(item.name)}
+                                onChange={handleFavorite(item.name)}
                               />
                             }
                             {item.name}
@@ -166,8 +172,8 @@ function SearchProgress({ progress }) {
       <Typography>Current Search History:</Typography>
       <Typography sx={{ pl: 2 }}>
         {/* {searchList} */}
-        {progress.map((item) => (
-          <Chip label={item} />
+        {progress.map((item, i) => (
+          <Chip label={item} key={i}/>
         ))}
       </Typography>
     </Stack>
@@ -187,23 +193,27 @@ function Favorites() {
   return (
     <Stack>
       <Typography variant="h5">Favorites</Typography>
-      {searchContext.favoriteList.map((item) => {
+      <List dense disablePadding>
+      {searchContext.favoriteList.map((item, i) => {
         return (
-          <List dense disablePadding>
-            <ListItem dense>
+            <ListItem dense key={i}>
               &bull;&nbsp;<Typography variant="body2">{item}</Typography>
             </ListItem>
-          </List>
         );
       })}
+      </List>
     </Stack>
   );
 }
+
+const drawerWidth = 240;
+
 export default function ExtendedInfo() {
   const defaultSearchTextValue = {
     clickedText: [],
     typedText: "",
   };
+  const [drawerOpen, setDrawerOpen] = useState(true);
   const [searchText, setSearchText] = useState(defaultSearchTextValue);
   const [favoriteList, setFavoriteList] = useState([]);
   // TODO: cleanup workaround for nextjs
@@ -233,6 +243,9 @@ export default function ExtendedInfo() {
     setSearchProgress([...searchProgress, searchText.typedText]);
     setSearchText(defaultSearchTextValue);
   };
+
+  const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+
   return (
     <AppContext.Provider
       value={{
@@ -242,12 +255,32 @@ export default function ExtendedInfo() {
         setFavoriteList,
       }}
     >
-      <AppBar color="success" position="static">
-        <Typography variant="h6" color="inherit" component="div">
-          AI is Awesome 😄
-        </Typography>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1}}>
+        <Toolbar>
+                    <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={toggleDrawer}
+            edge="start"
+            sx={[
+              {
+                mr: 2,
+              }
+            ]}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            Clipped drawer
+          </Typography>
+        </Toolbar>
       </AppBar>
-      <Stack direction={"row"} p={1}>
+
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Toolbar />
+      <Stack direction={"row"}>
         <Stack sx={{ flexGrow: "1" }}>
           <TextField
             label="Search"
@@ -274,14 +307,24 @@ export default function ExtendedInfo() {
             {results ? <SearchResults results={results} /> : null}
           </Stack>
         </Stack>
-        <Drawer
-          sx={{ mx: 3, p: 2, width: 400, backgroundColor: "#eee" }}
-          variant="permanent"
-          anchor="right"
-        >
-          <Favorites />
-        </Drawer>
       </Stack>
+      </Box>
+      <Drawer
+        variant="persistent"
+        open={drawerOpen}
+        anchor="right"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+        }}
+        >
+                  <Toolbar />
+        <Box sx={{ overflow: 'auto' }}>
+          <Favorites />
+          </Box>
+        </Drawer>
+      </Box>
     </AppContext.Provider>
   );
 }
