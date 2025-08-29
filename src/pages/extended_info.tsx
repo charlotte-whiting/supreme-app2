@@ -1,12 +1,17 @@
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import {
+  AppBar,
   Button,
   Checkbox,
+  Chip,
   CircularProgress,
+  Drawer,
   FormControl,
   FormControlLabel,
   FormGroup,
   FormLabel,
+  List,
+  ListItem,
   Stack,
   TextField,
   Typography,
@@ -25,7 +30,6 @@ type SearchText = {
   typedText: string;
 };
 
-// checkbox is to explore, heart is interest - to db
 type AppContextType = {
   searchText: SearchText;
   setSearchText: Dispatch<SetStateAction<SearchText>>;
@@ -152,15 +156,20 @@ function SearchResults({ results }) {
 }
 
 function SearchProgress({ progress }) {
-  let searchList = "";
-  for (let i = 0; i < progress.length; i++) {
-    const next = i == progress.length - 1 ? "" : " > ";
-    searchList = searchList + progress[i] + next;
-  }
+  // let searchList = "";
+  // for (let i = 0; i < progress.length; i++) {
+  //   const next = i == progress.length - 1 ? "" : " > ";
+  //   searchList = searchList + progress[i] + next;
+  // }
   return (
     <Stack>
       <Typography>Current Search History:</Typography>
-      <Typography sx={{ pl: 2 }}>{searchList}</Typography>
+      <Typography sx={{ pl: 2 }}>
+        {/* {searchList} */}
+        {progress.map((item) => (
+          <Chip label={item} />
+        ))}
+      </Typography>
     </Stack>
   );
 }
@@ -173,14 +182,31 @@ function SearchDisplay({ typedSearchText }) {
   );
 }
 
+function Favorites() {
+  const searchContext = useContext(AppContext);
+  return (
+    <Stack>
+      <Typography variant="h5">Favorites</Typography>
+      {searchContext.favoriteList.map((item) => {
+        return (
+          <List dense disablePadding>
+            <ListItem dense>
+              &bull;&nbsp;<Typography variant="body2">{item}</Typography>
+            </ListItem>
+          </List>
+        );
+      })}
+    </Stack>
+  );
+}
 export default function ExtendedInfo() {
   const defaultSearchTextValue = {
     clickedText: [],
     typedText: "",
   };
   const [searchText, setSearchText] = useState(defaultSearchTextValue);
-  // TODO: cleanup workaround for nextjs
   const [favoriteList, setFavoriteList] = useState([]);
+  // TODO: cleanup workaround for nextjs
   useEffect(() => {
     const fl = localStorage.getItem("favoriteList")
       ? JSON.parse(localStorage.getItem("favoriteList"))
@@ -216,10 +242,20 @@ export default function ExtendedInfo() {
         setFavoriteList,
       }}
     >
-      <Stack direction={"row"}>
+      <AppBar color="success" position="static">
+        <Typography variant="h6" color="inherit" component="div">
+          AI is Awesome 😄
+        </Typography>
+      </AppBar>
+      <Stack direction={"row"} p={1}>
         <Stack sx={{ flexGrow: "1" }}>
           <TextField
             label="Search"
+            onKeyUp={(event) => {
+              if (event.key == "Enter") {
+                onSubmit();
+              }
+            }}
             onChange={(event) => {
               setSearchText({
                 typedText: event.target.value,
@@ -238,9 +274,13 @@ export default function ExtendedInfo() {
             {results ? <SearchResults results={results} /> : null}
           </Stack>
         </Stack>
-        <Stack sx={{ mx: 3, p: 2, width: 400, backgroundColor: "#eee" }}>
-          {favoriteList}
-        </Stack>
+        <Drawer
+          sx={{ mx: 3, p: 2, width: 400, backgroundColor: "#eee" }}
+          variant="permanent"
+          anchor="right"
+        >
+          <Favorites />
+        </Drawer>
       </Stack>
     </AppContext.Provider>
   );
