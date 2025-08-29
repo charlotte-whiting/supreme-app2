@@ -10,14 +10,24 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { createContext, useContext, useState, Dispatch, SetStateAction } from "react";
 
 // checkbox is to explore, heart is interest - to db
+type AppContextType = {
+  searchText: string,
+  setSearchText: Dispatch<SetStateAction<string>>
+}
+
+const AppContext = createContext<AppContextType>({
+  searchText: '',
+  setSearchText: null
+});
 
 function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
   const [checkedMap, setCheckedMap] = useState(new Map());
   const [displayDesc, setDisplayDesc] = useState(false);
   const categories = Object.keys(results);
+  const searchTextState = useContext(AppContext);
   const handleCheck = (category: string, name: string) => () => {
     const isChecked = checkedMap.get(category + " " + name) || false;
     const newCheckedMap = new Map(checkedMap);
@@ -25,11 +35,14 @@ function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
     setCheckedMap(newCheckedMap);
     if (!isChecked) {
       setClickedSearchText([...clickedSearchText, name]);
+      searchTextState.setSearchText('unchecked');
     } else {
       const newClickedSearchText = clickedSearchText.filter(
         (item) => item != name
       );
       setClickedSearchText(newClickedSearchText);
+      searchTextState.setSearchText('checked');
+
     }
   };
   return (
@@ -115,6 +128,7 @@ function SearchDisplay({ typedSearchText, clickedSearchText }) {
 
 export default function ExtendedInfo() {
   const [typedSearchText, setTypedSearchText] = useState("");
+  const [searchText, setSearchText] = useState("");
   const [clickedSearchText, setClickedSearchText] = useState([]);
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -137,27 +151,34 @@ export default function ExtendedInfo() {
     setTypedSearchText("");
   };
   return (
-    <Stack>
-      <TextField
-        label="Search"
-        onChange={(event) => {
-          setTypedSearchText(event.target.value);
-        }}
-      />
-      <SearchDisplay
-        typedSearchText={typedSearchText}
-        clickedSearchText={clickedSearchText}
-      />
-      <Button onClick={onSubmit}>Submit</Button>
-      {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
-      {isLoading ? <CircularProgress /> : null}
-      {results ? (
-        <SearchResults
-          results={results}
-          setClickedSearchText={setClickedSearchText}
+    <AppContext.Provider value={{
+      searchText, 
+      setSearchText
+    }
+    }>
+      <Stack>
+        <TextField
+          label="Search"
+          onChange={(event) => {
+            setSearchText(event.target.value);
+          }}
+          value={searchText}
+        />
+        <SearchDisplay
+          typedSearchText={typedSearchText}
           clickedSearchText={clickedSearchText}
         />
-      ) : null}
-    </Stack>
-  );
+        <Button onClick={onSubmit}>Submit</Button>
+        {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
+        {isLoading ? <CircularProgress /> : null}
+        {results ? (
+          <SearchResults
+            results={results}
+            setClickedSearchText={setClickedSearchText}
+            clickedSearchText={clickedSearchText}
+          />
+        ) : null}
+      </Stack>
+    </AppContext.Provider>
+    );
 }
