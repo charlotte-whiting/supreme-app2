@@ -14,13 +14,17 @@ import { createContext, useContext, useState, Dispatch, SetStateAction } from "r
 
 // checkbox is to explore, heart is interest - to db
 type AppContextType = {
-  searchText: string,
-  setSearchText: Dispatch<SetStateAction<string>>
+  typedSearchText: string,
+  setTypedSearchText: Dispatch<SetStateAction<string>>,
+  clickedSearchText: Array<string>,
+  setClickedSearchText: Dispatch<SetStateAction<Array<string>>>,
 }
 
 const AppContext = createContext<AppContextType>({
-  searchText: '',
-  setSearchText: null
+  typedSearchText: '',
+  setTypedSearchText: null,
+  clickedSearchText: [],
+  setClickedSearchText: null
 });
 
 function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
@@ -35,13 +39,13 @@ function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
     setCheckedMap(newCheckedMap);
     if (!isChecked) {
       setClickedSearchText([...clickedSearchText, name]);
-      searchTextState.setSearchText('unchecked');
+      searchTextState.setTypedSearchText('unchecked');
     } else {
       const newClickedSearchText = clickedSearchText.filter(
         (item) => item != name
       );
       setClickedSearchText(newClickedSearchText);
-      searchTextState.setSearchText('checked');
+      searchTextState.setTypedSearchText('checked');
 
     }
   };
@@ -128,7 +132,7 @@ function SearchDisplay({ typedSearchText, clickedSearchText }) {
 
 export default function ExtendedInfo() {
   const [typedSearchText, setTypedSearchText] = useState("");
-  const [searchText, setSearchText] = useState("");
+  // const [searchText, setSearchText] = useState("");
   const [clickedSearchText, setClickedSearchText] = useState([]);
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -152,17 +156,19 @@ export default function ExtendedInfo() {
   };
   return (
     <AppContext.Provider value={{
-      searchText, 
-      setSearchText
+      typedSearchText: typedSearchText, 
+      setTypedSearchText: setTypedSearchText,
+      clickedSearchText: clickedSearchText,
+      setClickedSearchText: setClickedSearchText
     }
     }>
       <Stack>
         <TextField
           label="Search"
           onChange={(event) => {
-            setSearchText(event.target.value);
+            setTypedSearchText(event.target.value);
           }}
-          value={searchText}
+          value={typedSearchText}
         />
         <SearchDisplay
           typedSearchText={typedSearchText}
