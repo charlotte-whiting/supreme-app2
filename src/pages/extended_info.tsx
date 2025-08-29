@@ -1,3 +1,4 @@
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import {
   Button,
   Checkbox,
@@ -16,6 +17,7 @@ import {
   useState,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 
 type SearchText = {
@@ -27,11 +29,8 @@ type SearchText = {
 type AppContextType = {
   searchText: SearchText;
   setSearchText: Dispatch<SetStateAction<SearchText>>;
-
-  // typedSearchText: string;
-  // setTypedSearchText: Dispatch<SetStateAction<string>>;
-  // clickedSearchText: Array<string>;
-  // setClickedSearchText: Dispatch<SetStateAction<Array<string>>>;
+  favoriteList: Array<string>;
+  setFavoriteList: Dispatch<SetStateAction<Array<string>>>;
 };
 
 const AppContext = createContext<AppContextType>({
@@ -40,10 +39,8 @@ const AppContext = createContext<AppContextType>({
     typedText: "",
   },
   setSearchText: null,
-  // typedSearchText: "",
-  // setTypedSearchText: null,
-  // clickedSearchText: [],
-  // setClickedSearchText: null,
+  favoriteList: [],
+  setFavoriteList: null,
 });
 
 function SearchResults({ results }) {
@@ -70,6 +67,19 @@ function SearchResults({ results }) {
       }));
     }
   };
+
+  // TODO: cleanup
+  const handleFavorite = (name) => (event) => {
+    event.preventDefault();
+
+    const newFavoriteList = searchTextState.favoriteList.includes(name)
+      ? searchTextState.favoriteList.filter((item) => item != name)
+      : [...searchTextState.favoriteList, name];
+
+    searchTextState.setFavoriteList(newFavoriteList);
+    localStorage.setItem("favoriteList", JSON.stringify(newFavoriteList));
+  };
+
   return (
     <Stack>
       <Stack direction="row" gap={5} sx={{ mt: 5 }}>
@@ -105,7 +115,26 @@ function SearchResults({ results }) {
                             name={item.name}
                           />
                         }
-                        label={item.name}
+                        label={
+                          <>
+                            {
+                              <Checkbox
+                                icon={
+                                  // TODO: clean logic up
+                                  !searchTextState.favoriteList.includes(
+                                    item.name
+                                  ) ? (
+                                    <FavoriteBorder />
+                                  ) : (
+                                    <Favorite />
+                                  )
+                                }
+                                onClick={handleFavorite(item.name)}
+                              />
+                            }
+                            {item.name}
+                          </>
+                        }
                       />
                       {displayDesc ? (
                         <Typography>{item.description}</Typography>
@@ -136,7 +165,7 @@ function SearchProgress({ progress }) {
   );
 }
 
-function SearchDisplay({ typedSearchText, clickedSearchText }) {
+function SearchDisplay({ typedSearchText }) {
   return (
     <Stack direction="row">
       <Typography>{typedSearchText}</Typography>
@@ -145,13 +174,19 @@ function SearchDisplay({ typedSearchText, clickedSearchText }) {
 }
 
 export default function ExtendedInfo() {
-  // const [typedSearchText, setTypedSearchText] = useState("");
-  // const [clickedSearchText, setClickedSearchText] = useState([]);
   const defaultSearchTextValue = {
     clickedText: [],
     typedText: "",
   };
   const [searchText, setSearchText] = useState(defaultSearchTextValue);
+  // TODO: cleanup workaround for nextjs
+  const [favoriteList, setFavoriteList] = useState([]);
+  useEffect(() => {
+    const fl = localStorage.getItem("favoriteList")
+      ? JSON.parse(localStorage.getItem("favoriteList"))
+      : [];
+    setFavoriteList(fl);
+  }, []);
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [searchProgress, setSearchProgress] = useState([]);
@@ -177,27 +212,35 @@ export default function ExtendedInfo() {
       value={{
         searchText,
         setSearchText,
+        favoriteList,
+        setFavoriteList,
       }}
     >
-      <Stack>
-        <TextField
-          label="Search"
-          onChange={(event) => {
-            setSearchText({
-              typedText: event.target.value,
-              clickedText: event.target.value.split(","),
-            });
-          }}
-          value={searchText.typedText}
-        />
-        <SearchDisplay
-          typedSearchText={searchText.typedText}
-          clickedSearchText={searchText.clickedText}
-        />
-        <Button onClick={onSubmit}>Submit</Button>
-        {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
-        {isLoading ? <CircularProgress /> : null}
-        {results ? <SearchResults results={results} /> : null}
+      <Stack direction={"row"}>
+        <Stack sx={{ flexGrow: "1" }}>
+          <TextField
+            label="Search"
+            onChange={(event) => {
+              setSearchText({
+                typedText: event.target.value,
+                clickedText: event.target.value.split(","),
+              });
+            }}
+            value={searchText.typedText}
+          />
+          <SearchDisplay typedSearchText={searchText.typedText} />
+          <Button onClick={onSubmit}>Submit</Button>
+          <Stack>
+            {searchProgress ? (
+              <SearchProgress progress={searchProgress} />
+            ) : null}
+            {isLoading ? <CircularProgress /> : null}
+            {results ? <SearchResults results={results} /> : null}
+          </Stack>
+        </Stack>
+        <Stack sx={{ mx: 3, p: 2, width: 400, backgroundColor: "#eee" }}>
+          {favoriteList}
+        </Stack>
       </Stack>
     </AppContext.Provider>
   );
