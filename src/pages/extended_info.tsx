@@ -10,24 +10,43 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { createContext, useContext, useState, Dispatch, SetStateAction } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from "react";
+
+type SearchText = {
+  clickedText: string[];
+  typedText: string;
+};
 
 // checkbox is to explore, heart is interest - to db
 type AppContextType = {
-  typedSearchText: string,
-  setTypedSearchText: Dispatch<SetStateAction<string>>,
-  clickedSearchText: Array<string>,
-  setClickedSearchText: Dispatch<SetStateAction<Array<string>>>,
-}
+  searchText: SearchText;
+  setSearchText: Dispatch<SetStateAction<SearchText>>;
+
+  // typedSearchText: string;
+  // setTypedSearchText: Dispatch<SetStateAction<string>>;
+  // clickedSearchText: Array<string>;
+  // setClickedSearchText: Dispatch<SetStateAction<Array<string>>>;
+};
 
 const AppContext = createContext<AppContextType>({
-  typedSearchText: '',
-  setTypedSearchText: null,
-  clickedSearchText: [],
-  setClickedSearchText: null
+  searchText: {
+    clickedText: [],
+    typedText: "",
+  },
+  setSearchText: null,
+  // typedSearchText: "",
+  // setTypedSearchText: null,
+  // clickedSearchText: [],
+  // setClickedSearchText: null,
 });
 
-function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
+function SearchResults({ results }) {
   const [checkedMap, setCheckedMap] = useState(new Map());
   const [displayDesc, setDisplayDesc] = useState(false);
   const categories = Object.keys(results);
@@ -38,15 +57,17 @@ function SearchResults({ results, setClickedSearchText, clickedSearchText }) {
     newCheckedMap.set(category + " " + name, !isChecked);
     setCheckedMap(newCheckedMap);
     if (!isChecked) {
-      setClickedSearchText([...clickedSearchText, name]);
-      searchTextState.setTypedSearchText('unchecked');
+      searchTextState.setSearchText((currentState) => ({
+        clickedText: [...currentState.clickedText, name],
+        typedText: [...currentState.clickedText, name].join(","),
+      }));
     } else {
-      const newClickedSearchText = clickedSearchText.filter(
-        (item) => item != name
-      );
-      setClickedSearchText(newClickedSearchText);
-      searchTextState.setTypedSearchText('checked');
-
+      const newClickedSearchText =
+        searchTextState.searchText.clickedText.filter((item) => item != name);
+      searchTextState.setSearchText((currentState) => ({
+        clickedText: newClickedSearchText,
+        typedText: newClickedSearchText.join(","),
+      }));
     }
   };
   return (
@@ -116,24 +137,21 @@ function SearchProgress({ progress }) {
 }
 
 function SearchDisplay({ typedSearchText, clickedSearchText }) {
-  let clickedList = "";
-  for (let i = 0; i < clickedSearchText.length; i++) {
-    const next = i == clickedSearchText.length - 1 ? "" : ", ";
-    clickedList = clickedList + clickedSearchText[i] + next;
-  }
   return (
     <Stack direction="row">
-      <Typography>
-        {typedSearchText}, {clickedList}
-      </Typography>
+      <Typography>{typedSearchText}</Typography>
     </Stack>
   );
 }
 
 export default function ExtendedInfo() {
-  const [typedSearchText, setTypedSearchText] = useState("");
-  // const [searchText, setSearchText] = useState("");
-  const [clickedSearchText, setClickedSearchText] = useState([]);
+  // const [typedSearchText, setTypedSearchText] = useState("");
+  // const [clickedSearchText, setClickedSearchText] = useState([]);
+  const defaultSearchTextValue = {
+    clickedText: [],
+    typedText: "",
+  };
+  const [searchText, setSearchText] = useState(defaultSearchTextValue);
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [searchProgress, setSearchProgress] = useState([]);
@@ -146,45 +164,41 @@ export default function ExtendedInfo() {
         "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify(typedSearchText),
+      body: JSON.stringify(searchText.typedText),
     });
     const aiResults = await response.json();
     setResults(JSON.parse(aiResults.message));
     setIsLoading(false);
-    setSearchProgress([...searchProgress, typedSearchText]);
-    setTypedSearchText("");
+    setSearchProgress([...searchProgress, searchText.typedText]);
+    setSearchText(defaultSearchTextValue);
   };
   return (
-    <AppContext.Provider value={{
-      typedSearchText: typedSearchText, 
-      setTypedSearchText: setTypedSearchText,
-      clickedSearchText: clickedSearchText,
-      setClickedSearchText: setClickedSearchText
-    }
-    }>
+    <AppContext.Provider
+      value={{
+        searchText,
+        setSearchText,
+      }}
+    >
       <Stack>
         <TextField
           label="Search"
           onChange={(event) => {
-            setTypedSearchText(event.target.value);
+            setSearchText({
+              typedText: event.target.value,
+              clickedText: event.target.value.split(","),
+            });
           }}
-          value={typedSearchText}
+          value={searchText.typedText}
         />
         <SearchDisplay
-          typedSearchText={typedSearchText}
-          clickedSearchText={clickedSearchText}
+          typedSearchText={searchText.typedText}
+          clickedSearchText={searchText.clickedText}
         />
         <Button onClick={onSubmit}>Submit</Button>
         {searchProgress ? <SearchProgress progress={searchProgress} /> : null}
         {isLoading ? <CircularProgress /> : null}
-        {results ? (
-          <SearchResults
-            results={results}
-            setClickedSearchText={setClickedSearchText}
-            clickedSearchText={clickedSearchText}
-          />
-        ) : null}
+        {results ? <SearchResults results={results} /> : null}
       </Stack>
     </AppContext.Provider>
-    );
+  );
 }
