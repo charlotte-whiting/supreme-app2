@@ -1,19 +1,21 @@
 import type { NextApiRequest } from "next";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import pkg from "pg";
 
-export default async function handler(req: NextApiRequest, res) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+const apiKey = process.env.GEMINI_API_KEY;
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
+export default async function handler(req: NextApiRequest, res) {
   const allComics = [];
 
   await Promise.all(
     req.body.map(async (comicNameAndIssue) => {
       const prompt = `Please tell me only the estimated value for an ungraded ${comicNameAndIssue} in very fine condition in the following format: *Title* *Issue Number* *Price Range*`;
-      const result = await model.generateContent(prompt);
-      const comic = result.response.text();
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: prompt,
+      });
+      const comic = response.text;
       const splitResponse = comic.split("*");
       const { Pool } = pkg;
       const pool = new Pool({ connectionString: process.env.DATABASE_URL });
