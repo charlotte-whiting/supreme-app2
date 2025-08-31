@@ -228,7 +228,7 @@ function Favorites() {
           })
         ) : (
           <Typography variant="body2" fontStyle={"italic"}>
-            Click on the hearts next to interesting results to add some
+            Click on the hearts next to interesting results to save some
             favorites!
           </Typography>
         )}
