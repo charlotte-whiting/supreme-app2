@@ -303,13 +303,37 @@ export default function ExtendedInfo() {
               flexGrow={1}
               display="flex"
               flexDirection={"row"}
-              gap={1}
-              sx={{ paddingLeft: 2 }}
+              sx={{ paddingLeft: 3, alignItems: "center" }}
             >
               <AutoAwesome />
-              <Typography variant="h6" noWrap component="div">
-                supreme-app
-              </Typography>
+              <Box
+                display="flex"
+                flexDirection="row"
+                sx={{ alignItems: "baseline" }}
+              >
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  fontWeight="bold"
+                  fontStyle="italic"
+                  fontSize="1.65rem"
+                  sx={{ paddingLeft: 1 }}
+                >
+                  K
+                </Typography>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  fontWeight="bold"
+                  // fontStyle="italic"
+                  fontSize="1.15rem"
+                  sx={{ paddingLeft: 0.25 }}
+                >
+                  URATE
+                </Typography>
+              </Box>
             </Box>
             <Box sx={{ mr: 2 }}>
               <IconButton
