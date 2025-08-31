@@ -1,14 +1,8 @@
-import {
-  AutoAwesome,
-  Delete,
-  Favorite,
-  FavoriteBorder,
-} from "@mui/icons-material";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import MenuIcon from "@mui/icons-material/Menu";
 
 import {
   AppBar,
-  Badge,
   Box,
   Button,
   Checkbox,
@@ -47,8 +41,6 @@ type AppContextType = {
   setSearchText: Dispatch<SetStateAction<SearchText>>;
   favoriteList: Array<string>;
   setFavoriteList: Dispatch<SetStateAction<Array<string>>>;
-  drawerOpen: boolean;
-  setTriggerAlert: Dispatch<SetStateAction<boolean>>;
 };
 
 const AppContext = createContext<AppContextType>({
@@ -59,8 +51,6 @@ const AppContext = createContext<AppContextType>({
   setSearchText: null,
   favoriteList: [],
   setFavoriteList: null,
-  drawerOpen: true,
-  setTriggerAlert: null,
 });
 
 function SearchResults({ results }) {
@@ -76,14 +66,14 @@ function SearchResults({ results }) {
     if (!isChecked) {
       searchTextState.setSearchText((currentState) => ({
         clickedText: [...currentState.clickedText, name],
-        typedText: [...currentState.clickedText, name].join(", "),
+        typedText: [...currentState.clickedText, name].join(","),
       }));
     } else {
       const newClickedSearchText =
         searchTextState.searchText.clickedText.filter((item) => item != name);
       searchTextState.setSearchText((currentState) => ({
         clickedText: newClickedSearchText,
-        typedText: newClickedSearchText.join(", "),
+        typedText: newClickedSearchText.join(","),
       }));
     }
   };
@@ -91,8 +81,6 @@ function SearchResults({ results }) {
   // TODO: cleanup
   const handleFavorite = (name) => (event) => {
     event.preventDefault();
-
-    searchTextState.setTriggerAlert(!searchTextState.drawerOpen);
 
     const newFavoriteList = searchTextState.favoriteList.includes(name)
       ? searchTextState.favoriteList.filter((item) => item != name)
@@ -104,31 +92,24 @@ function SearchResults({ results }) {
 
   return (
     <Stack>
-      <Stack direction="row" sx={{ mt: 5 }} display="flex">
-        <Box flexGrow={1} display="flex" flexDirection={"row"} gap={1}>
-          {searchTextState.favoriteList.length >= 1 ? null : (
-            <Typography fontWeight="bold" fontSize="15" fontStyle="italic">
-              Here are the search results - select what interest you!
-            </Typography>
-          )}
-        </Box>
-        <Box>
-          <Button
-            variant={displayDesc ? "contained" : "outlined"}
-            size="small"
-            onClick={() => {
-              setDisplayDesc(!displayDesc);
-            }}
-          >
-            Display Descriptions
-          </Button>
-        </Box>
+      <Stack direction="row" sx={{ mt: 5 }}>
+        <Typography>
+          Here are the search results - select what interest you!
+        </Typography>
+        <Button
+          variant={displayDesc ? "contained" : "outlined"}
+          onClick={() => {
+            setDisplayDesc(!displayDesc);
+          }}
+        >
+          Display Descriptions
+        </Button>
       </Stack>
       <Stack direction="row">
         {categories.map((category) => {
           return (
             <FormControl key={category}>
-              <FormLabel>{category.toUpperCase()}</FormLabel>
+              <FormLabel>{category}</FormLabel>
               <FormGroup>
                 {results[category].map((item, i) => {
                   return (
@@ -158,8 +139,7 @@ function SearchResults({ results }) {
                                     <Favorite />
                                   )
                                 }
-                                // TODO: investigate why onChange doesn't work
-                                onClick={handleFavorite(item.name)}
+                                onChange={handleFavorite(item.name)}
                               />
                             }
                             {item.name}
@@ -167,9 +147,7 @@ function SearchResults({ results }) {
                         }
                       />
                       {displayDesc ? (
-                        <Typography variant="body2" fontStyle={"italic"}>
-                          {item.description}
-                        </Typography>
+                        <Typography>{item.description}</Typography>
                       ) : null}
                     </Stack>
                   );
@@ -191,47 +169,38 @@ function SearchProgress({ progress }) {
   // }
   return (
     <Stack>
-      <Typography fontWeight={"bold"} fontSize={15}>
-        Current Search History:
-      </Typography>
-      <Box sx={{ pl: 2, display: "flex", gap: 1, flexWrap: "wrap" }}>
+      <Typography>Current Search History:</Typography>
+      <Typography sx={{ pl: 2 }}>
         {/* {searchList} */}
         {progress.map((item, i) => (
-          <Chip label={item} key={i} />
+          <Chip label={item} key={i}/>
         ))}
-      </Box>
+      </Typography>
+    </Stack>
+  );
+}
+
+function SearchDisplay({ typedSearchText }) {
+  return (
+    <Stack direction="row">
+      <Typography>{typedSearchText}</Typography>
     </Stack>
   );
 }
 
 function Favorites() {
   const searchContext = useContext(AppContext);
-  const handleDelete = (item) => () => {
-    const newFavoriteList = searchContext.favoriteList.filter((i) => i != item);
-    searchContext.setFavoriteList(newFavoriteList);
-    localStorage.setItem("favoriteList", JSON.stringify(newFavoriteList));
-  };
   return (
     <Stack>
       <Typography variant="h5">Favorites</Typography>
       <List dense disablePadding>
-        {searchContext.favoriteList.length >= 1 ? (
-          searchContext.favoriteList.map((item, i) => {
-            return (
-              <ListItem dense key={i}>
-                <IconButton onClick={handleDelete(item)}>
-                  <Delete />
-                </IconButton>
-                <Typography variant="body2">{item}</Typography>
-              </ListItem>
-            );
-          })
-        ) : (
-          <Typography variant="body2" fontStyle={"italic"}>
-            Click on the hearts next to interesting results to add some
-            favorites!
-          </Typography>
-        )}
+      {searchContext.favoriteList.map((item, i) => {
+        return (
+            <ListItem dense key={i}>
+              &bull;&nbsp;<Typography variant="body2">{item}</Typography>
+            </ListItem>
+        );
+      })}
       </List>
     </Stack>
   );
@@ -257,7 +226,6 @@ export default function ExtendedInfo() {
   const [results, setResults] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [searchProgress, setSearchProgress] = useState([]);
-  const [triggerAlert, setTriggerAlert] = useState(false);
 
   const onSubmit = async () => {
     setIsLoading(true);
@@ -276,10 +244,7 @@ export default function ExtendedInfo() {
     setSearchText(defaultSearchTextValue);
   };
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-    setTriggerAlert(false);
-  };
+  const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
   return (
     <AppContext.Provider
@@ -288,93 +253,75 @@ export default function ExtendedInfo() {
         setSearchText,
         favoriteList,
         setFavoriteList,
-        drawerOpen,
-        setTriggerAlert,
       }}
     >
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <AppBar
-          position="fixed"
-          sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, py: 2 }}
-        >
-          <Box display="flex" sx={{ alignItems: "center" }}>
-            <Box
-              flexGrow={1}
-              display="flex"
-              flexDirection={"row"}
-              gap={1}
-              sx={{ paddingLeft: 2 }}
-            >
-              <AutoAwesome />
-              <Typography variant="h6" noWrap component="div">
-                supreme-app
-              </Typography>
-            </Box>
-            <Box sx={{ mr: 2 }}>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleDrawer}
-                edge="start"
-              >
-                {triggerAlert ? (
-                  <Badge badgeContent="!" color="secondary">
-                    {drawerOpen ? <Favorite /> : <FavoriteBorder />}
-                  </Badge>
-                ) : drawerOpen ? (
-                  <Favorite />
-                ) : (
-                  <FavoriteBorder />
-                )}
-              </IconButton>
-            </Box>
-          </Box>
-        </AppBar>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1}}>
+        <Toolbar>
+                    <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={toggleDrawer}
+            edge="start"
+            sx={[
+              {
+                mr: 2,
+              }
+            ]}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap component="div">
+            Clipped drawer
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-        <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 10 }}>
-          <Stack direction={"row"}>
-            <Stack sx={{ flexGrow: "1" }}>
-              <TextField
-                label="Search"
-                onKeyUp={(event) => {
-                  if (event.key == "Enter") {
-                    onSubmit();
-                  }
-                }}
-                onChange={(event) => {
-                  setSearchText({
-                    typedText: event.target.value,
-                    clickedText: event.target.value.split(","),
-                  });
-                }}
-                value={searchText.typedText}
-              />
-              <Button onClick={onSubmit}>Submit</Button>
-              <Stack>
-                {searchProgress ? (
-                  <SearchProgress progress={searchProgress} />
-                ) : null}
-                {isLoading ? <CircularProgress /> : null}
-                {results ? <SearchResults results={results} /> : null}
-              </Stack>
-            </Stack>
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Toolbar />
+      <Stack direction={"row"}>
+        <Stack sx={{ flexGrow: "1" }}>
+          <TextField
+            label="Search"
+            onKeyUp={(event) => {
+              if (event.key == "Enter") {
+                onSubmit();
+              }
+            }}
+            onChange={(event) => {
+              setSearchText({
+                typedText: event.target.value,
+                clickedText: event.target.value.split(","),
+              });
+            }}
+            value={searchText.typedText}
+          />
+          <SearchDisplay typedSearchText={searchText.typedText} />
+          <Button onClick={onSubmit}>Submit</Button>
+          <Stack>
+            {searchProgress ? (
+              <SearchProgress progress={searchProgress} />
+            ) : null}
+            {isLoading ? <CircularProgress /> : null}
+            {results ? <SearchResults results={results} /> : null}
           </Stack>
-        </Box>
-        <Drawer
-          variant="persistent"
-          open={drawerOpen}
-          anchor="right"
-          sx={{
-            width: drawerOpen ? drawerWidth : 0,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {
-              width: drawerOpen ? drawerWidth : 0,
-            },
-          }}
+        </Stack>
+      </Stack>
+      </Box>
+      <Drawer
+        variant="persistent"
+        open={drawerOpen}
+        anchor="right"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+        }}
         >
-          <Box sx={{ mt: 10, px: 1 }}>
-            <Favorites />
+                  <Toolbar />
+        <Box sx={{ overflow: 'auto' }}>
+          <Favorites />
           </Box>
         </Drawer>
       </Box>

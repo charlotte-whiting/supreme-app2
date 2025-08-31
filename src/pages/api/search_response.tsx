@@ -5,7 +5,7 @@ export default async function handler(req: NextApiRequest, res) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
   const prompt = `Return a list of movies, shows, and novels related to the plot of ${req.body}. 
   Must have books in response. 
-  Please include exactly 5 entries for each.
+  Please include at least 4 entries for each.
   Include their name and why it's great. 
   Description of greatness must be less than 15 words.`;
 
