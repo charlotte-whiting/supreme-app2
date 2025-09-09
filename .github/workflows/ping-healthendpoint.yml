@@ -5,7 +5,7 @@ on:
     # At minute 0 past every 2nd hour
 jobs:
   ping:
-    runs-on:
+    runs-on: ubuntu-latest
     steps:
       - name: Ping the health endpoint
         env:
