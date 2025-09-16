@@ -1,0 +1,12 @@
+name: Ping Health Endpoint
+on:
+  schedule:
+    - cron: "*/14 * * * *"
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the health endpoint
+        env:
+          ENDPOINT_URL: ${{ secrets.ENDPOINT_URL }}
+        run: curl -sS "${ENDPOINT_URL}"
